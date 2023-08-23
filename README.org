@@ -1,0 +1,24 @@
+* GenMutator
+[Onging work]
+
+A Java mutator. Not for mutation testing.
+
+
+
+** Build and Usage
++ Requirements: [[https://spoon.gforge.inria.fr/index.html][Spoon]] used in this tool requires Java 11 or newer versions.
+  
++ Build a jar with dependencies as below.
+#+begin_src sh
+mvn compile assembly:single
+#+end_src
+
++ Use it with input directory (=-i=) and output directory (=-o=) specified.
++ =-n= is optional, default to 1. Set it to other values for multiple cycles of generation.
+#+begin_src sh
+java -jar target/genMutator-1.0-SNAPSHOT-jar-with-dependencies.jar -i type1-proj  -o .output/type1 -n 10
+#+end_src
+
+
+** Credits
+Borrow some code from https://github.com/SpoonLabs/metamutator.
