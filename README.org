@@ -16,8 +16,15 @@ mvn compile assembly:single
 + Use it with input directory (=-i=) and output directory (=-o=) specified.
 + =-n= is optional, default to 1. Set it to other values for multiple cycles of generation.
 #+begin_src sh
-java -jar target/genMutator-1.0-SNAPSHOT-jar-with-dependencies.jar -i type1-proj  -o .output/type1 -n 10
+java -jar target/genMutator-1.0-SNAPSHOT-jar-with-dependencies.jar -i type1-proj  -o .output/type1 -n 5
 #+end_src
+
+Or check the =example= directory.
+#+begin_src sh
+cd examples
+./run-example.sh
+#+end_src
+
 
 
 ** Credits
