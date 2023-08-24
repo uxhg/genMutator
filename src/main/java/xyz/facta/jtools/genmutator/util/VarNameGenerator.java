@@ -1,6 +1,8 @@
 package xyz.facta.jtools.genmutator.util;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public class VarNameGenerator {
 
@@ -27,24 +29,30 @@ public class VarNameGenerator {
     };
 
     private static final Random rand = new Random();
+    private static final Set<String> generatedNames = new HashSet<>();
 
     public static String generateVariableName() {
-        StringBuilder nameBuilder = new StringBuilder();
+        String name;
+        do {
+            StringBuilder nameBuilder = new StringBuilder();
 
-        // 50% chance to add a prefix
-        if (rand.nextInt(100) < 50) {
-            nameBuilder.append(PREFIXES[rand.nextInt(PREFIXES.length)]);
-        }
+            // 50% chance to add a prefix
+            if (rand.nextInt(100) < 50) {
+                nameBuilder.append(PREFIXES[rand.nextInt(PREFIXES.length)]);
+            }
 
-        // 50% chance to add an adjective
-        if (rand.nextInt(100) < 50) {
-            nameBuilder.append(capitalize(ADJECTIVES[rand.nextInt(ADJECTIVES.length)]));
-        }
+            // 50% chance to add an adjective
+            if (rand.nextInt(100) < 50) {
+                nameBuilder.append(capitalize(ADJECTIVES[rand.nextInt(ADJECTIVES.length)]));
+            }
 
-        // Always add a main word
-        nameBuilder.append(capitalize(WORD_POOL[rand.nextInt(WORD_POOL.length)]));
+            // Always add a main word
+            nameBuilder.append(capitalize(WORD_POOL[rand.nextInt(WORD_POOL.length)]));
+            name = decapitalize(nameBuilder.toString());
+        } while (generatedNames.contains(name));
 
-        return decapitalize(nameBuilder.toString());
+        generatedNames.add(name);
+        return name;
     }
 
     private static String capitalize(String str) {
