@@ -12,9 +12,8 @@ import java.util.*;
 
 public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean>> {
 
-    private static int index = 0;
-    private HashSet<CtElement> hostSpots = new HashSet<>();
-    private static Random rand = new Random();
+    private final HashSet<CtElement> hostSpots = new HashSet<>();
+    private static final Random rand = new Random();
 
     private static final EnumSet<BinaryOperatorKind> LOGICAL_OPERATORS = EnumSet
         .of(BinaryOperatorKind.AND, BinaryOperatorKind.OR);
@@ -79,8 +78,7 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
         BinaryOperatorKind newBinOpKind = getRandomElementExcept(operators, originalKind);
 
 
-
-        CtBinaryOperator newExprOp = getFactory().Code().createBinaryOperator(expression.getLeftHandOperand(), expression.getRightHandOperand(), newBinOpKind);
+        CtBinaryOperator<Boolean> newExprOp = getFactory().Code().createBinaryOperator(expression.getLeftHandOperand(), expression.getRightHandOperand(), newBinOpKind);
         //String newExpression = newExprOp.toString();
         ////String newExpression = expression.getLeftHandOperand() + newBinOpKind + expression.getRightHandOperand();
 
@@ -98,7 +96,7 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
 
     private boolean isNumber(CtExpression<?> operand) {
 
-        if (operand.getType().toString().equals(CtTypeReference.NULL_TYPE_NAME))
+        if (operand.getType() == null || operand.getType().toString().equals(CtTypeReference.NULL_TYPE_NAME))
             return false;
 
         if (operand.toString().contains(".class"))
