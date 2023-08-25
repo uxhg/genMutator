@@ -28,4 +28,5 @@ cd examples
 
 
 ** Credits
-Borrow some code from https://github.com/SpoonLabs/metamutator.
++ Borrow some code from https://github.com/SpoonLabs/metamutator.
++ Words for name generation from https://github.com/dariusk/corpora.

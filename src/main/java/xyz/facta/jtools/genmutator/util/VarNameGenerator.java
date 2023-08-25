@@ -1,37 +1,47 @@
 package xyz.facta.jtools.genmutator.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import xyz.facta.jtools.genmutator.data.AdjectiveList;
+import xyz.facta.jtools.genmutator.data.NounList;
+import xyz.facta.jtools.genmutator.data.VerbList;
+
+import java.io.File;
+import java.io.InputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VarNameGenerator {
-
-    private static final String[] WORD_POOL = {
-        "data", "info", "details", "config", "temp", "user",
-        "account", "settings", "file", "path", "buffer", "string",
-        "number", "count", "index", "table", "list", "map", "set",
-        "queue", "stack", "heap", "input", "output", "result", "object",
-        "value", "element", "node", "id", "name", "content", "view"
-    };
-
-    private static final String[] ADJECTIVES = {
-        "current", "previous", "next", "first", "last", "new",
-        "old", "temp", "main", "default", "primary", "secondary",
-        "final", "mutable", "immutable", "local", "global", "persistent",
-        "dynamic", "static", "internal", "external", "nested", "concrete",
-        "derived", "shared", "transient"
-    };
-
-    private static final String[] PREFIXES = {
-        "get", "set", "is", "has", "can", "update", "delete", "add", "validate",
-        "check", "compute", "fetch", "store", "begin", "start", "resume", "pause", "exec",
-        "process", "trigger", "display", "handle", "resolve", "toggle"
-    };
+    private static List<String> adjectives;
+    private static List<String> verbs;  // This will hold only the present form
+    private static List<String> nouns;
 
     private static final Random rand = new Random();
     private static final Set<String> generatedNames = new HashSet<>();
-    private static final int MAX_TRIES = 4;
+    private static final int MAX_TRIES = 2;
+    static{
+        try {
+            ObjectMapper mapper = new ObjectMapper();
 
+            InputStream adjsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
+            AdjectiveList adjList = mapper.readValue(adjsStream, AdjectiveList.class);
+
+            InputStream verbsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
+            VerbList verbList = mapper.readValue(verbsStream, VerbList.class);
+
+            InputStream nounsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
+            NounList nounList = mapper.readValue(nounsStream, NounList.class);
+
+            adjectives = adjList.getAdjectives();
+            verbs = verbList.getVerbs().stream().map(VerbList.Verb::getPresent).collect(Collectors.toList());
+            nouns = nounList.getNouns();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static String generateVariableName() {
         int tries = 1;
         String name;
@@ -41,17 +51,17 @@ public class VarNameGenerator {
 
                 // 50% chance to add a prefix
                 if (rand.nextInt(100) < 50) {
-                    nameBuilder.append(PREFIXES[rand.nextInt(PREFIXES.length)]);
+                    nameBuilder.append(verbs.get(rand.nextInt(verbs.size())));
                 }
 
                 // 50% chance to add an adjective
                 if (rand.nextInt(100) < 50) {
-                    nameBuilder.append(capitalize(ADJECTIVES[rand.nextInt(ADJECTIVES.length)]));
+                    nameBuilder.append(capitalize(adjectives.get(rand.nextInt(adjectives.size()))));
                 }
 
                 // Always add a main word
-                nameBuilder.append(capitalize(WORD_POOL[rand.nextInt(WORD_POOL.length)]));
-                name = decapitalize(nameBuilder.toString());
+                nameBuilder.append(capitalize(nouns.get(rand.nextInt(nouns.size()))));
+                name = sanitizeWord(decapitalize(nameBuilder.toString()));
                 tries++;
             } else {
                 name = generateRandomLetterName();
@@ -86,5 +96,13 @@ public class VarNameGenerator {
             return str;
         }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
+
+    public static String sanitizeWord(String word) {
+        if (word == null) {
+            return null;
+        }
+        return word.replaceAll("[^a-zA-Z0-9_]", "");
     }
 }
