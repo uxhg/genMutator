@@ -1,14 +1,22 @@
 package xyz.facta.jtools.genmutator;
 
 import spoon.Launcher;
+import spoon.processing.AbstractProcessor;
+import spoon.processing.Processor;
 import spoon.reflect.CtModel;
+import spoon.reflect.declaration.CtTypedElement;
 import xyz.facta.jtools.genmutator.mut.BinOpExprMutator;
 import xyz.facta.jtools.genmutator.mut.VarRenameMutator;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.util.List;
+import java.util.Random;
 
 public class App {
+
+    private static final Random RANDOM = new Random();
+    private static final double PROCESSOR_APPLY_PROBABILITY = 0.9;
     public static void main(String[] args) {
 
         Options options = new Options();
@@ -46,19 +54,23 @@ public class App {
             numberOfCycles = Integer.parseInt(cmd.getOptionValue("cycles"));
         }
 
+        List<Processor<?>> processors = List.of(new BinOpExprMutator(), new VarRenameMutator());
         for (int i = 1; i <= numberOfCycles; i++) {
             String currentOutputPath = baseOutputDirectoryPath + File.separator + i;
-            processSourceCodeDir(inputResourcePath, currentOutputPath);
+            processSourceCodeDir(inputResourcePath, currentOutputPath, processors);
         }
     }
 
-    private static void processSourceCodeDir(String inPath, String outPath) {
+    private static void processSourceCodeDir(String inPath, String outPath, List<Processor<?>> processors) {
         Launcher launcher = new Launcher();
         launcher.addInputResource(inPath);
 
-        // Add processors
-        launcher.addProcessor(new BinOpExprMutator());
-        launcher.addProcessor(new VarRenameMutator());
+        // Add processors with prob
+        for (Processor<?> processor : processors) {
+            if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {
+                launcher.addProcessor(processor);
+            }
+        }
 
         launcher.getEnvironment().setSourceOutputDirectory(new File(outPath));
         CtModel model = launcher.buildModel();
