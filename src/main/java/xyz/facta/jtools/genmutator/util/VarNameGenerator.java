@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class VarNameGenerator {
     private static List<String> adjectives;
-    private static List<String> verbs;  // This will hold only the present form
+    private static List<String> verbs;
     private static List<String> nouns;
 
     private static final Random rand = new Random();
@@ -35,6 +35,7 @@ public class VarNameGenerator {
             NounList nounList = mapper.readValue(nounsStream, NounList.class);
 
             adjectives = adjList.getAdjectives();
+            // This will hold only the present form
             verbs = verbList.getVerbs().stream().map(VerbList.Verb::getPresent).collect(Collectors.toList());
             nouns = nounList.getNouns();
 

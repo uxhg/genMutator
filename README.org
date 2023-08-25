@@ -19,12 +19,11 @@ mvn compile assembly:single
 java -jar target/genMutator-1.0-SNAPSHOT-jar-with-dependencies.jar -i type1-proj  -o .output/type1 -n 5
 #+end_src
 
-Or check the =example= directory.
+Or check the =examples= directory.
 #+begin_src sh
 cd examples
 ./run-example.sh
 #+end_src
-
 
 
 ** Credits
