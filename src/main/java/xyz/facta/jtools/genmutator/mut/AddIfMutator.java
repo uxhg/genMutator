@@ -5,6 +5,8 @@ import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.visitor.filter.TypeFilter;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -12,12 +14,11 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
-
+    private static final Logger logger = LogManager.getLogger(AddIfMutator.class);
     private final Random random = new Random();
 
-    private boolean shouldInsertIfStatement() {
-        // For this example, we're using a 50% chance to insert the if statement
-        return random.nextBoolean();
+    private boolean shouldInsertIfStatement(double probability) {
+        return random.nextDouble() < probability;
     }
 
     private CtIf createIfStatementForInvocation(CtInvocation<?> invocation) {
@@ -35,12 +36,16 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
     @Override
     public void process(CtInvocation<?> invocation) {
         //System.out.println("Apply AddIfMutator to file: " + invocation.getPosition());
-        if (shouldInsertIfStatement()) {
+        if (shouldInsertIfStatement(0.4)) {
             CtIf newIfStatement = createIfStatementForInvocation(invocation);
 
             if (newIfStatement != null) {
                 CtElement parent = invocation.getParent();
-
+                logger.debug("parent is: {}, type is: {}\n", parent.prettyprint(), parent.getClass().getName());
+                if (parent instanceof CtBinaryOperator) {
+                    logger.info("skip, parent {} is also binary operation\n", parent);
+                    return;
+                }
                 if (parent instanceof CtBlock<?>) {
                     // If the parent is a block, simply replace the invocation with the new if statement
                     invocation.replace(newIfStatement);
@@ -54,8 +59,8 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
                     if (parentBlock != null) {
                         int position = parentBlock.getStatements().indexOf(invocation);
                         if (position < 0) {
-                            System.out.printf("invocation pos of parent block is %s\n", position);
-                            System.out.printf("invocation is: %s\n", invocation);
+                            logger.debug("invocation pos of parent block is {}\n", position);
+                            logger.debug("invocation is: {}\n", invocation);
                             position = 0;
                         }
                         parentBlock.getStatements().add(position, block);
