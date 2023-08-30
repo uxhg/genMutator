@@ -1,12 +1,12 @@
 package xyz.facta.jtools.genmutator.mut;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.visitor.filter.TypeFilter;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +35,6 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
 
     @Override
     public void process(CtInvocation<?> invocation) {
-        //System.out.println("Apply AddIfMutator to file: " + invocation.getPosition());
         if (shouldInsertIfStatement(0.4)) {
             CtIf newIfStatement = createIfStatementForInvocation(invocation);
 
