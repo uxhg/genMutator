@@ -1,25 +1,29 @@
 package xyz.facta.jtools.genmutator;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spoon.Launcher;
+import spoon.processing.AbstractProcessor;
 import spoon.processing.Processor;
 import spoon.reflect.CtModel;
+import spoon.reflect.code.*;
 import xyz.facta.jtools.genmutator.mut.AddIfMutator;
 import xyz.facta.jtools.genmutator.mut.BinOpExprMutator;
+import xyz.facta.jtools.genmutator.mut.DeletionMutator;
 import xyz.facta.jtools.genmutator.mut.VarRenameMutator;
-import org.apache.commons.cli.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class);
     private static final Random RANDOM = new Random();
-    private static final double PROCESSOR_APPLY_PROBABILITY = 0.9;
+    //private static final double PROCESSOR_APPLY_PROBABILITY = 0.9;
 
     public static void main(String[] args) {
 
@@ -39,14 +43,18 @@ public class App {
         options.addOption(cycles);
 
 
-        Option binOpMutOption = new Option("mbo", "mut-bin-op-expr", false, "Enable binary operator mutator");
-        options.addOption(binOpMutOption);
+        Option cfgFile = new Option("c", "config", true, "path to the configuration file");
+        cycles.setRequired(true);
+        options.addOption(cfgFile);
 
-        Option renameVariableOption = new Option("mrv", "mut-rename-variable", false, "Enable variable renaming mutator");
-        options.addOption(renameVariableOption);
+        //Option binOpMutOption = new Option("mbo", "mut-bin-op-expr", false, "Enable binary operator mutator");
+        //options.addOption(binOpMutOption);
 
-        Option addIfStructOption = new Option("mai", "mut-add-if", false, "Enable adding if structure mutator");
-        options.addOption(addIfStructOption);
+        //Option renameVariableOption = new Option("mrv", "mut-rename-variable", false, "Enable variable renaming mutator");
+        //options.addOption(renameVariableOption);
+
+        //Option addIfStructOption = new Option("mai", "mut-add-if", false, "Enable adding if structure mutator");
+        //options.addOption(addIfStructOption);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -69,8 +77,15 @@ public class App {
         }
 
 
-        List<Processor<?>> processors =  getProcessors(cmd);
-        if (processors.isEmpty()){
+        //List<Processor<?>> processors = getProcessors(cmd);
+        Map<String, AbstractProcessor<?>> processors;
+        try {
+            processors = readConfig(cmd.getOptionValue("config"));
+        } catch (IOException e) {
+            logger.error("Cannot read configuration file @{}", cmd.getOptionValue("cfg"));
+            throw new RuntimeException(e);
+        }
+        if (processors.isEmpty()) {
             logger.error("No processors added, please enable at least one processor, see help for details");
             return;
         }
@@ -79,6 +94,18 @@ public class App {
             String currentOutputPath = baseOutputDirectoryPath + File.separator + i;
             processSourceCodeDir(inputResourcePath, currentOutputPath, processors);
         }
+    }
+
+
+    /**
+     * Load and parse the configuration JSON
+     */
+    private static Map<String, AbstractProcessor<?>> readConfig(String configFileName) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(new File(configFileName));
+
+        // Initialize processors based on configuration
+        return initializeProcessors(rootNode);
     }
 
     private static List<Processor<?>> getProcessors(CommandLine cmd) {
@@ -96,20 +123,129 @@ public class App {
         return processors;
     }
 
-    private static void processSourceCodeDir(String inPath, String outPath, List<Processor<?>> processors) {
+    private static void processSourceCodeDir(String inPath, String outPath, Map<String, AbstractProcessor<?>> processors) {
         Launcher launcher = new Launcher();
         launcher.addInputResource(inPath);
 
         // Add processors with prob
-        for (Processor<?> processor : processors) {
-            if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {
-                launcher.addProcessor(processor);
-            }
+        for (Processor<?> processor : processors.values()) {
+            //if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {
+            launcher.addProcessor(processor);
+            //}
         }
 
         launcher.getEnvironment().setSourceOutputDirectory(new File(outPath));
         CtModel model = launcher.buildModel();
+
+        //Map<CtStatement, Integer> originalLineNumbers = new HashMap<>();
+        // Iterate through classes and capture line numbers
+        //for (CtClass clazz : model.getRootPackage().getElements(new TypeFilter<>(CtClass.class))) {
+        //    List<CtStatement> statements = clazz.getElements(new LineFilter());
+
+        //    for (CtStatement statement : statements) {
+        //        // Store the original line number of each statement
+        //        originalLineNumbers.put(statement, statement.getPosition().getLine());
+        //    }
+        //}
+
         launcher.process();
         launcher.prettyprint();
     }
+
+
+    private static Map<String, AbstractProcessor<?>> initializeProcessors(JsonNode configNode) {
+        Map<String, AbstractProcessor<?>> processors = new HashMap<>();
+
+        // Initialize the VarRenameMutator if enabled
+        if (configNode.has("VarRename") && configNode.get("VarRename").has("enabled") &&
+            configNode.get("VarRename").get("enabled").asBoolean()) {
+            double probability = configNode.get("VarRename").get("prob").asDouble();
+            VarRenameMutator varRenameProcessor = new VarRenameMutator(probability);
+            processors.put("VarRename", varRenameProcessor);
+        }
+
+        // Initialize the BinOpExprMutator if enabled
+        if (configNode.has("BinOp") && configNode.get("BinOp").has("enabled") &&
+            configNode.get("BinOp").get("enabled").asBoolean()) {
+            double probability = configNode.get("BinOp").get("prob").asDouble();
+            JsonNode binOpCategoryNode = configNode.get("BinOp").get("category");
+            Set<BinOpExprMutator.BinOpCategory> categories = new HashSet<>();
+            if (binOpCategoryNode.has("logical") && binOpCategoryNode.get("logical").asBoolean()) {
+                categories.add(BinOpExprMutator.BinOpCategory.LOGICAL);
+            }
+            if (binOpCategoryNode.has("comparison") && binOpCategoryNode.get("comparison").asBoolean()) {
+                categories.add(BinOpExprMutator.BinOpCategory.COMPARISON);
+            }
+            if (binOpCategoryNode.has("arithmetic") && binOpCategoryNode.get("arithmetic").asBoolean()) {
+                categories.add(BinOpExprMutator.BinOpCategory.ARITHMETIC);
+            }
+            BinOpExprMutator binOpProcessor = new BinOpExprMutator(probability, categories);
+            processors.put("BinOp", binOpProcessor);
+        }
+
+        // Initialize the AddIfProcessor if enabled
+        if (configNode.has("AddIf") && configNode.get("AddIf").has("enabled") &&
+            configNode.get("AddIf").get("enabled").asBoolean()) {
+            double probability = configNode.get("AddIf").get("prob").asDouble();
+            AddIfMutator addIfProcessor = new AddIfMutator(probability);
+            processors.put("AddIf", addIfProcessor);
+        }
+
+        // Initialize the RandomDeletionProcessor if enabled
+        if (configNode.has("Deletion") && configNode.get("Deletion").has("enabled") &&
+            configNode.get("Deletion").get("enabled").asBoolean()) {
+            JsonNode deletionGlobalConfigNode = configNode.get("Deletion").get("global");
+            //double probability = deletionGlobalConfigNode.get("prob").asDouble();
+            DeletionMutator.Distribution distribution = DeletionMutator.Distribution.valueOf(
+                deletionGlobalConfigNode.get("distribution").asText().toUpperCase()
+            );
+            Set<Integer> linesNotToTouch = extractLinesNotToTouch(deletionGlobalConfigNode);
+            Set<Class<? extends CtStatement>> stmtTypesNotToTouch = extractStatementTypes(deletionGlobalConfigNode);
+            int minNumOfLinesToDelete = deletionGlobalConfigNode.get("minNumOfLinesToDelete").asInt();
+            int maxNumOfLinesToDelete = deletionGlobalConfigNode.get("maxNumOfLinesToDelete").asInt();
+
+            if (configNode.get("Deletion").get("enabled").asBoolean()) {
+                processors.put("Deletion", new DeletionMutator(stmtTypesNotToTouch, linesNotToTouch, minNumOfLinesToDelete, maxNumOfLinesToDelete, distribution));
+            }
+        }
+
+        return processors;
+    }
+
+
+    public static Set<Integer> extractLinesNotToTouch(JsonNode configNode) {
+        Set<Integer> linesNotToTouch = new HashSet<>();
+        JsonNode linesNode = configNode.get("linesNotToTouch");
+        if (linesNode != null && linesNode.isArray()) {
+            for (JsonNode line : linesNode) {
+                linesNotToTouch.add(line.asInt());
+            }
+        }
+        return linesNotToTouch;
+    }
+
+    public static Set<Class<? extends CtStatement>> extractStatementTypes(JsonNode configNode) {
+        Set<Class<? extends CtStatement>> statementTypes = new HashSet<>();
+        JsonNode typesNode = configNode.get("typesNotToTouch");
+        if (typesNode != null && typesNode.isArray()) {
+            for (JsonNode type : typesNode) {
+                String typeName = type.asText();
+                switch (typeName) {
+                    case "invocation":
+                        statementTypes.add(CtInvocation.class);
+                        break;
+                    case "return":
+                        statementTypes.add(CtReturn.class);
+                        break;
+                    case "assignment":
+                        statementTypes.add(CtAssignment.class);
+                        break;
+                    case "if":
+                        statementTypes.add(CtIf.class);
+                }
+            }
+        }
+        return statementTypes;
+    }
+
 }

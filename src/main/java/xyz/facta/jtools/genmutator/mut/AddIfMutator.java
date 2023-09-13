@@ -17,7 +17,17 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
     private static final Logger logger = LogManager.getLogger(AddIfMutator.class);
     private final Random random = new Random();
 
-    private boolean shouldInsertIfStatement(double probability) {
+    private final double probability;
+
+    public AddIfMutator(double prob) {
+        probability = prob;
+    }
+
+    public AddIfMutator() {
+        this(0.5);
+    }
+
+    private boolean shouldInsertIfStatement() {
         return random.nextDouble() < probability;
     }
 
@@ -35,7 +45,7 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
 
     @Override
     public void process(CtInvocation<?> invocation) {
-        if (shouldInsertIfStatement(0.4)) {
+        if (shouldInsertIfStatement()) {
             CtIf newIfStatement = createIfStatementForInvocation(invocation);
 
             if (newIfStatement != null) {

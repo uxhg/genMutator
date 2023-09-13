@@ -1,8 +1,8 @@
 package xyz.facta.jtools.genmutator.mut;
 
+import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtBinaryOperator;
-import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
@@ -14,7 +14,8 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
 
     private final HashSet<CtElement> hostSpots = new HashSet<>();
     private static final Random rand = new Random();
-
+    private final double probability;
+    private final Set<BinOpCategory> categories;
     private static final EnumSet<BinaryOperatorKind> LOGICAL_OPERATORS = EnumSet
         .of(BinaryOperatorKind.AND, BinaryOperatorKind.OR);
     private static final EnumSet<BinaryOperatorKind> COMPARISON_OPERATORS = EnumSet
@@ -27,25 +28,40 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
     private static final EnumSet<BinaryOperatorKind> ARITHMETIC_OPERATORS = EnumSet
         .of(BinaryOperatorKind.PLUS, BinaryOperatorKind.MINUS, BinaryOperatorKind.DIV, BinaryOperatorKind.MUL);
 
+    public BinOpExprMutator(double prob, Set<BinOpCategory> categories) {
+        this.probability = prob;
+        this.categories = categories;
+    }
+
+    public BinOpExprMutator() {
+        this(0.5, EnumSet.allOf(BinOpCategory.class));
+    }
+
     @Override
     public void process(CtBinaryOperator<Boolean> binaryOperator) {
-
+        if (rand.nextDouble() > probability)
+            return;
         BinaryOperatorKind kind = binaryOperator.getKind();
         if (LOGICAL_OPERATORS.contains(kind)) {
-            mutateOperator(binaryOperator, LOGICAL_OPERATORS);
-        } else if(ARITHMETIC_OPERATORS.contains(kind)){
-            if (isNumber(binaryOperator.getLeftHandOperand())
+            if (categories.contains(BinOpCategory.LOGICAL)) { // check configuration: logical op mutation enabled
+                mutateOperator(binaryOperator, LOGICAL_OPERATORS);
+            }
+        } else if (ARITHMETIC_OPERATORS.contains(kind)) {
+            if (categories.contains(BinOpCategory.ARITHMETIC)
+                && isNumber(binaryOperator.getLeftHandOperand())
                 && isNumber(binaryOperator.getRightHandOperand())) {
                 mutateOperator(binaryOperator, ARITHMETIC_OPERATORS);
             }
         } else if (COMPARISON_OPERATORS.contains(kind)) {
-            if (isNumber(binaryOperator.getLeftHandOperand())
-                && isNumber(binaryOperator.getRightHandOperand())) {
-                mutateOperator(binaryOperator, COMPARISON_OPERATORS);
-            } else {
-                EnumSet<BinaryOperatorKind> clone = REDUCED_COMPARISON_OPERATORS.clone();
-                clone.add(kind);
-                mutateOperator(binaryOperator, clone);
+            if (categories.contains(BinOpCategory.COMPARISON)) {
+                if (isNumber(binaryOperator.getLeftHandOperand())
+                    && isNumber(binaryOperator.getRightHandOperand())) {
+                    mutateOperator(binaryOperator, COMPARISON_OPERATORS);
+                } else {
+                    EnumSet<BinaryOperatorKind> clone = REDUCED_COMPARISON_OPERATORS.clone();
+                    clone.add(kind);
+                    mutateOperator(binaryOperator, clone);
+                }
             }
         }
     }
@@ -126,5 +142,11 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
 
     private boolean isTopLevel(CtElement parent) {
         return parent instanceof CtClass && ((CtClass<?>) parent).isTopLevel();
+    }
+
+    public enum BinOpCategory {
+        LOGICAL,
+        COMPARISON,
+        ARITHMETIC
     }
 }

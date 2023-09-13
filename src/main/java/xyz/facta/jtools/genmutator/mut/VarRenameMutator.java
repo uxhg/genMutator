@@ -9,8 +9,16 @@ import java.util.Random;
 
 public class VarRenameMutator extends AbstractProcessor<CtVariable> {
 
-    private static final float MUTATION_PROBABILITY = 0.5f;  // 50% chance
+    private final double MUTATION_PROBABILITY;
     private final Random random = new Random();
+
+    public VarRenameMutator(double mutationProbability) {
+        MUTATION_PROBABILITY = mutationProbability;
+    }
+
+    public VarRenameMutator() {
+        this(0.5);
+    }
 
     @Override
     public void process(CtVariable ctVar) {
@@ -21,7 +29,7 @@ public class VarRenameMutator extends AbstractProcessor<CtVariable> {
     }
 
     private boolean shouldMutate() {
-        return random.nextFloat() <= MUTATION_PROBABILITY;
+        return random.nextDouble() <= MUTATION_PROBABILITY;
     }
 
 }

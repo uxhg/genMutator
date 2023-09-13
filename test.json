@@ -1,0 +1,29 @@
+{ 
+    "VarRename": {
+        "enabled": true,
+        "prob": 0.5
+    },
+    "BinOp": {
+        "enabled": true,
+        "prob": 0.4,
+        "category":{
+            "logical": true,
+            "comparison": true,
+            "arithmetic": true
+        }
+    },
+    "AddIf": {
+        "enabled": true,
+        "prob": 0.4
+    },
+    "Deletion": {
+        "enabled": true,
+        "global": {
+            "typeNotTouch": ["return", "if"],
+            "distribution": "even",
+            "linesNotToTouch": [0],
+            "minNumOfLinesToDelete": 0,
+            "maxNumOfLinesToDelete": 3
+        }
+    }
+}
