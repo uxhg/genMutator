@@ -21,8 +21,8 @@
         "global": {
             "typeNotTouch": ["return", "if"],
             "distribution": "even",
-            "linesNotToTouch": [0],
-            "minNumOfLinesToDelete": 0,
+            "linesNotToTouch": [1],
+            "minNumOfLinesToDelete": 1,
             "maxNumOfLinesToDelete": 3
         }
     }

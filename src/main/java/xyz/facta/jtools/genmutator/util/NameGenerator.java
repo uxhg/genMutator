@@ -5,7 +5,6 @@ import xyz.facta.jtools.genmutator.data.AdjectiveList;
 import xyz.facta.jtools.genmutator.data.NounList;
 import xyz.facta.jtools.genmutator.data.VerbList;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class VarNameGenerator {
+public class NameGenerator {
     private static List<String> adjectives;
     private static List<String> verbs;
     private static List<String> nouns;
@@ -25,13 +24,13 @@ public class VarNameGenerator {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            InputStream adjsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
+            InputStream adjsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
             AdjectiveList adjList = mapper.readValue(adjsStream, AdjectiveList.class);
 
-            InputStream verbsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
+            InputStream verbsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
             VerbList verbList = mapper.readValue(verbsStream, VerbList.class);
 
-            InputStream nounsStream = VarNameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
+            InputStream nounsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
             NounList nounList = mapper.readValue(nounsStream, NounList.class);
 
             adjectives = adjList.getAdjectives();
@@ -43,7 +42,7 @@ public class VarNameGenerator {
             e.printStackTrace();
         }
     }
-    public static String generateVariableName() {
+    public static String generateName(boolean prefix, boolean adjective) {
         int tries = 1;
         String name;
         do {
@@ -51,12 +50,12 @@ public class VarNameGenerator {
                 StringBuilder nameBuilder = new StringBuilder();
 
                 // 50% chance to add a prefix
-                if (rand.nextInt(100) < 50) {
+                if (prefix && rand.nextInt(100) < 50) {
                     nameBuilder.append(verbs.get(rand.nextInt(verbs.size())));
                 }
 
                 // 50% chance to add an adjective
-                if (rand.nextInt(100) < 50) {
+                if (adjective && rand.nextInt(100) < 50) {
                     nameBuilder.append(capitalize(adjectives.get(rand.nextInt(adjectives.size()))));
                 }
 
