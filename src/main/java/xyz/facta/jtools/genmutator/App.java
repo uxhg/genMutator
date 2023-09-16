@@ -10,14 +10,12 @@ import spoon.processing.AbstractProcessor;
 import spoon.processing.Processor;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
-import xyz.facta.jtools.genmutator.mut.AddIfMutator;
-import xyz.facta.jtools.genmutator.mut.BinOpExprMutator;
-import xyz.facta.jtools.genmutator.mut.DeletionMutator;
-import xyz.facta.jtools.genmutator.mut.VarRenameMutator;
+import xyz.facta.jtools.genmutator.mut.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class App {
 
@@ -207,6 +205,15 @@ public class App {
             if (configNode.get("Deletion").get("enabled").asBoolean()) {
                 processors.put("Deletion", new DeletionMutator(stmtTypesNotToTouch, linesNotToTouch, minNumOfLinesToDelete, maxNumOfLinesToDelete, distribution));
             }
+        }
+
+        // Initialize the FnNameMutator if enabled
+        if (configNode.has("FnRename") && configNode.get("FnRename").has("enabled") &&
+            configNode.get("FnRename").get("enabled").asBoolean()) {
+            double probability = configNode.get("FnRename").get("prob").asDouble();
+            Pattern pattern = Pattern.compile(configNode.get("FnRename").get("pattern").asText());
+            FnNameMutator varRenameProcessor = new FnNameMutator(pattern, probability);
+            processors.put("FnRename", varRenameProcessor);
         }
 
         return processors;

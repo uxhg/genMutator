@@ -4,14 +4,18 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtMethod;
 import xyz.facta.jtools.genmutator.util.NameGenerator;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
+    private final Random random = new Random();
     private final Pattern patternToMatch;
+    private final double MUTATION_PROBABILITY;
     //private final NameGenerator nameGenerator;
 
-    public FnNameMutator(Pattern patternToMatch) {
+    public FnNameMutator(Pattern patternToMatch, double prob) {
         this.patternToMatch = patternToMatch;
+        this.MUTATION_PROBABILITY = prob;
         // this.nameGenerator = nameGenerator;
     }
 
@@ -19,7 +23,7 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
     @Override
     public void process(CtMethod<?> method) {
         // Check if the method name matches the specified pattern
-        if (patternToMatch.matcher(method.getSimpleName()).matches()) {
+        if (shouldMutate() && patternToMatch.matcher(method.getSimpleName()).matches()) {
             // Generate a new name using the shared NameGenerator
             String newName = NameGenerator.generateName(false, true);
 
@@ -39,6 +43,10 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
             // Add the mutated method to the declaring type
             method.getDeclaringType().addMethod(mutatedMethod);
         }
+    }
+
+    private boolean shouldMutate() {
+        return random.nextDouble() <= MUTATION_PROBABILITY;
     }
 
 
