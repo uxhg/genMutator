@@ -42,20 +42,20 @@ public class NameGenerator {
             e.printStackTrace();
         }
     }
-    public static String generateName(boolean prefix, boolean adjective) {
+    public static String generateName(double prefixProb, double adjectiveProb) {
         int tries = 1;
         String name;
         do {
             if (tries <= MAX_TRIES) {
                 StringBuilder nameBuilder = new StringBuilder();
 
-                // 50% chance to add a prefix
-                if (prefix && rand.nextInt(100) < 50) {
+                // prefixProb chance to add a prefix
+                if (rand.nextDouble() < prefixProb) {
                     nameBuilder.append(verbs.get(rand.nextInt(verbs.size())));
                 }
 
-                // 50% chance to add an adjective
-                if (adjective && rand.nextInt(100) < 50) {
+                // adjectiveProb chance to add an adjective
+                if (rand.nextDouble() < adjectiveProb) {
                     nameBuilder.append(capitalize(adjectives.get(rand.nextInt(adjectives.size()))));
                 }
 
@@ -84,7 +84,7 @@ public class NameGenerator {
         return name.toString();
     }
 
-    private static String capitalize(String str) {
+    public static String capitalize(String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }

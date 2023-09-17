@@ -25,7 +25,7 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
         // Check if the method name matches the specified pattern
         if (shouldMutate() && patternToMatch.matcher(method.getSimpleName()).matches()) {
             // Generate a new name using the shared NameGenerator
-            String newName = NameGenerator.generateName(false, true);
+            String newName = NameGenerator.generateName(-1, 0.5);
 
             // Create a new method by copying the original method
             CtMethod<?> mutatedMethod = getFactory().Method().create(

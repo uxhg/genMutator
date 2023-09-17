@@ -145,7 +145,6 @@ public class App {
         //        originalLineNumbers.put(statement, statement.getPosition().getLine());
         //    }
         //}
-
         launcher.process();
         launcher.prettyprint();
     }
@@ -212,8 +211,15 @@ public class App {
             configNode.get("FnRename").get("enabled").asBoolean()) {
             double probability = configNode.get("FnRename").get("prob").asDouble();
             Pattern pattern = Pattern.compile(configNode.get("FnRename").get("pattern").asText());
-            FnNameMutator varRenameProcessor = new FnNameMutator(pattern, probability);
-            processors.put("FnRename", varRenameProcessor);
+            FnNameMutator fnNameMutator = new FnNameMutator(pattern, probability);
+            processors.put("FnRename", fnNameMutator);
+        }
+        // Initialize the InvocationMutator if enabled
+        if (configNode.has("InvocationRename") && configNode.get("InvocationRename").has("enabled") &&
+            configNode.get("InvocationRename").get("enabled").asBoolean()) {
+            double probability = configNode.get("InvocationRename").get("prob").asDouble();
+            InvocationMutator invocationMutator = new InvocationMutator(probability);
+            processors.put("InvocationRename", invocationMutator);
         }
 
         return processors;

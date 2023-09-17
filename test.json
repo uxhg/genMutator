@@ -14,15 +14,19 @@
     },
     "AddIf": {
         "enabled": true,
-        "prob": 0.4
+        "prob": 0.3
     },
     "FnRename" :{
         "enabled": true,
         "pattern": ".*",
         "prob": 0.8
     },
-    "Deletion": {
+    "InvocationRename": {
         "enabled": true,
+        "prob": 0.8
+    },
+    "Deletion": {
+        "enabled": false,
         "global": {
             "typeNotTouch": ["return", "if"],
             "distribution": "even",
