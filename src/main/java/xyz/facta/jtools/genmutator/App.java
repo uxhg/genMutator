@@ -112,7 +112,7 @@ public class App {
             processors.add(new BinOpExprMutator());
         }
         if (cmd.hasOption("mrv")) {
-            processors.add(new VarRenameMutator());
+            processors.add(new VarNameMutator());
         }
 
         if (cmd.hasOption("mai")) {
@@ -154,11 +154,11 @@ public class App {
     private static Map<String, AbstractProcessor<?>> initializeProcessors(JsonNode configNode) {
         Map<String, AbstractProcessor<?>> processors = new HashMap<>();
 
-        // Initialize the VarRenameMutator if enabled
+        // Initialize the VarNameMutator if enabled
         if (configNode.has("VarRename") && configNode.get("VarRename").has("enabled") &&
             configNode.get("VarRename").get("enabled").asBoolean()) {
             double probability = configNode.get("VarRename").get("prob").asDouble();
-            VarRenameMutator varRenameProcessor = new VarRenameMutator(probability);
+            VarNameMutator varRenameProcessor = new VarNameMutator(probability);
             processors.put("VarRename", varRenameProcessor);
         }
 

@@ -7,16 +7,16 @@ import xyz.facta.jtools.genmutator.util.NameGenerator;
 
 import java.util.Random;
 
-public class VarRenameMutator extends AbstractProcessor<CtVariable> {
+public class VarNameMutator extends AbstractProcessor<CtVariable> {
 
     private final double MUTATION_PROBABILITY;
     private final Random random = new Random();
 
-    public VarRenameMutator(double mutationProbability) {
+    public VarNameMutator(double mutationProbability) {
         MUTATION_PROBABILITY = mutationProbability;
     }
 
-    public VarRenameMutator() {
+    public VarNameMutator() {
         this(0.5);
     }
 
