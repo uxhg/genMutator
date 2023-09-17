@@ -35,13 +35,13 @@ public class InvocationMutator extends AbstractProcessor<CtInvocation<?>> {
     }
 
     private static String renameFn(String fnName) {
-        List<String> optionalKeywords = Arrays.asList("isPresent", "hasValue", "isNotEmpty", "hasData", "isSet", "exist", "exists");
+        List<String> optionalKeywords = Arrays.asList("isPresent", "hasValue", "isNotEmpty", "hasData", "isSet", "exist", "exists", "isNotBlank");
         if (optionalKeywords.contains(fnName)) {
             int randomIndex = (int) (Math.random() * optionalKeywords.size());
             return optionalKeywords.get(randomIndex);
         }
 
-        List<String> optionalNotKeywords = Arrays.asList("isNone", "notExist", "isEmpty", "isNull", "isMissing");
+        List<String> optionalNotKeywords = Arrays.asList("isNone", "notExist", "isEmpty", "isNull", "isMissing", "isBlank");
         if (optionalNotKeywords.contains(fnName)) {
             int randomIndex = (int) (Math.random() * optionalNotKeywords.size());
             return optionalNotKeywords.get(randomIndex);

@@ -1,7 +1,7 @@
 { 
     "VarRename": {
         "enabled": true,
-        "prob": 0.5
+        "prob": 0.8
     },
     "BinOp": {
         "enabled": true,
@@ -14,7 +14,7 @@
     },
     "AddIf": {
         "enabled": true,
-        "prob": 0.3
+        "prob": 0.4
     },
     "FnRename" :{
         "enabled": true,
@@ -22,6 +22,10 @@
         "prob": 0.8
     },
     "InvocationRename": {
+        "enabled": true,
+        "prob": 0.8
+    },
+    "TypeRefMutate": {
         "enabled": true,
         "prob": 0.8
     },

@@ -125,6 +125,7 @@ public class App {
         Launcher launcher = new Launcher();
         launcher.addInputResource(inPath);
 
+        //launcher.addProcessor(new EncapsulateClassProcessor());
         // Add processors with prob
         for (Processor<?> processor : processors.values()) {
             //if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {
@@ -222,6 +223,13 @@ public class App {
             processors.put("InvocationRename", invocationMutator);
         }
 
+        // Initialize the TypeRefMutator if enabled
+        if (configNode.has("TypeRefMutate") && configNode.get("TypeRefMutate").has("enabled") &&
+            configNode.get("TypeRefMutate").get("enabled").asBoolean()) {
+            double probability = configNode.get("TypeRefMutate").get("prob").asDouble();
+            TypeRefMutator typeRefMutator = new TypeRefMutator(probability);
+            processors.put("TypeRefMutate", typeRefMutator);
+        }
         return processors;
     }
 
