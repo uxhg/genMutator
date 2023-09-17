@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
+public class AddIfMutator extends AbstractProcessor<CtAssignment<?, ?>> {
     private static final Logger logger = LogManager.getLogger(AddIfMutator.class);
     private final Random random = new Random();
 
@@ -31,62 +31,63 @@ public class AddIfMutator extends AbstractProcessor<CtInvocation<?>> {
         return random.nextDouble() < probability;
     }
 
-    private CtIf createIfStatementForInvocation(CtInvocation<?> invocation) {
-        CtIf ifStmt = invocation.getFactory().Core().createIf();
-        CtExpression<Boolean> condition = generateConditionBasedOnContext(invocation);
+    private CtIf createIfStatementForStat(CtStatement stat) {
+        CtIf ifStmt = stat.getFactory().Core().createIf();
+        CtExpression<Boolean> condition = generateConditionBasedOnContext(stat);
 
         if (condition != null) {
             ifStmt.setCondition(condition);
-            ifStmt.setThenStatement(invocation.clone());
+            ifStmt.setThenStatement(stat.clone());
             return ifStmt;
         }
         return null;
     }
 
     @Override
-    public void process(CtInvocation<?> invocation) {
+    public void process(CtAssignment<?, ?> assignment) {
         if (shouldInsertIfStatement()) {
-            CtIf newIfStatement = createIfStatementForInvocation(invocation);
+            CtIf newIfStatement = createIfStatementForStat(assignment);
 
             if (newIfStatement != null) {
-                CtElement parent = invocation.getParent();
+                CtElement parent = assignment.getParent();
                 logger.debug("parent is: {}, type is: {}\n", parent.prettyprint(), parent.getClass().getName());
                 if (parent instanceof CtBinaryOperator) {
                     logger.info("skip, parent {} is also binary operation\n", parent);
                     return;
                 }
                 if (parent instanceof CtBlock<?>) {
-                    // If the parent is a block, simply replace the invocation with the new if statement
-                    invocation.replace(newIfStatement);
+                    // If the parent is a block, simply replace the assignment with the new if statement
+                    assignment.replace(newIfStatement);
                 } else {
                     // Create a new block and add the new if statement to it
-                    CtBlock<?> block = invocation.getFactory().Core().createBlock();
+                    CtBlock<?> block = assignment.getFactory().Core().createBlock();
                     block.addStatement(newIfStatement);
 
                     // Find the parent block and insert the new block at the appropriate position
-                    CtBlock<?> parentBlock = invocation.getParent(CtBlock.class);
+                    CtBlock<?> parentBlock = assignment.getParent(CtBlock.class);
                     if (parentBlock != null) {
-                        int position = parentBlock.getStatements().indexOf(invocation);
+                        int position = parentBlock.getStatements().indexOf(assignment);
                         if (position < 0) {
-                            logger.debug("invocation pos of parent block is {}\n", position);
-                            logger.debug("invocation is: {}\n", invocation);
+                            logger.debug("assignment pos of parent block is {}\n", position);
+                            logger.debug("assignment is: {}\n", assignment);
                             position = 0;
                         }
                         parentBlock.getStatements().add(position, block);
 
-                        // Now, remove the original invocation
-                        invocation.delete();
+                        // Now, remove the original assignment
+                        assignment.delete();
                     }
                 }
             }
         }
     }
 
-    private CtExpression<Boolean> generateConditionBasedOnContext(CtInvocation<?> invocation) {
-        Factory factory = invocation.getFactory();
+
+    private CtExpression<Boolean> generateConditionBasedOnContext(CtStatement stat) {
+        Factory factory = stat.getFactory();
 
         // Gather available local variables from the context
-        List<CtVariableAccess<?>> availableVariables = gatherAvailableVariables(invocation);
+        List<CtVariableAccess<?>> availableVariables = gatherAvailableVariables(stat);
         List<CtExpression<Boolean>> booleanVariables = availableVariables.stream().filter(Objects::nonNull)
             .filter(var -> var.getType() != null && (var.getType().toString().equals("boolean") || var.getType().toString().equals("java.lang.Boolean")))
             .map(var -> (CtExpression<Boolean>) var) // Explicit casting here
