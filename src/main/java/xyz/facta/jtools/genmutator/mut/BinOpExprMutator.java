@@ -1,5 +1,7 @@
 package xyz.facta.jtools.genmutator.mut;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtBinaryOperator;
@@ -12,6 +14,7 @@ import java.util.*;
 
 public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean>> {
 
+    private static final Logger logger = LogManager.getLogger(BinOpExprMutator.class);
     private final HashSet<CtElement> hostSpots = new HashSet<>();
     private static final Random rand = new Random();
     private final double probability;
@@ -82,9 +85,7 @@ public class BinOpExprMutator extends AbstractProcessor<CtBinaryOperator<Boolean
         }
 
         if (alreadyInHotsSpot(expression) || expression.toString().contains(".is(\"")) {
-            System.out
-                .printf("Expression '%s' ignored because it is included in previous hot spot%n",
-                    expression);
+            logger.warn("Expression '{}' ignored because it is included in previous hot spot", expression);
             return;
         }
 

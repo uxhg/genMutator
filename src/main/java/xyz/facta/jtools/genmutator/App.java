@@ -40,6 +40,10 @@ public class App {
         cycles.setType(Number.class);
         options.addOption(cycles);
 
+        Option startNum = new Option( "startNumber", true, "start number in output file names");
+        startNum.setRequired(false);
+        startNum.setType(Number.class);
+        options.addOption(startNum);
 
         Option cfgFile = new Option("c", "config", true, "path to the configuration file");
         cycles.setRequired(true);
@@ -88,8 +92,9 @@ public class App {
             return;
         }
 
-        for (int i = 1; i <= numberOfCycles; i++) {
-            String currentOutputPath = baseOutputDirectoryPath + File.separator + i;
+        for (int i = 0; i < numberOfCycles; i++) {
+            int subDirNumber = i + Integer.parseInt(cmd.getOptionValue("startNumber", "1"));
+            String currentOutputPath = baseOutputDirectoryPath + File.separator + subDirNumber;
             processSourceCodeDir(inputResourcePath, currentOutputPath, processors);
         }
     }
