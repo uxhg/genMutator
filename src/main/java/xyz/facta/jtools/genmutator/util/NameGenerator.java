@@ -1,9 +1,12 @@
 package xyz.facta.jtools.genmutator.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import xyz.facta.jtools.genmutator.data.AdjectiveList;
 import xyz.facta.jtools.genmutator.data.NounList;
 import xyz.facta.jtools.genmutator.data.VerbList;
+import xyz.facta.jtools.genmutator.mut.FnNameMutator;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -13,25 +16,29 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NameGenerator {
+    private static final Logger logger = LogManager.getLogger(NameGenerator.class);
     private static List<String> adjectives;
     private static List<String> verbs;
     private static List<String> nouns;
 
     private static final Random rand = new Random();
     private static final Set<String> generatedNames = new HashSet<>();
-    private static final int MAX_TRIES = 2;
+    private static final int MAX_TRIES = 4;
     static{
         try {
             ObjectMapper mapper = new ObjectMapper();
 
             InputStream adjsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
             AdjectiveList adjList = mapper.readValue(adjsStream, AdjectiveList.class);
+            logger.info("Load {} adjectives", adjList.getAdjectives().size());
 
             InputStream verbsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
             VerbList verbList = mapper.readValue(verbsStream, VerbList.class);
+            logger.info("Load {} verbs", verbList.getVerbs().size());
 
             InputStream nounsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
             NounList nounList = mapper.readValue(nounsStream, NounList.class);
+            logger.info("Load {} nouns", nounList.getNouns().size());
 
             adjectives = adjList.getAdjectives();
             // This will hold only the present form
