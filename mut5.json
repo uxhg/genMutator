@@ -1,0 +1,42 @@
+{ 
+    "VarRename": {
+        "enabled": true,
+        "prob": 0.8
+    },
+    "BinOp": {
+        "enabled": false,
+        "prob": 0.7,
+        "category":{
+            "logical": true,
+            "comparison": true,
+            "arithmetic": true
+        }
+    },
+    "AddIf": {
+        "enabled": false,
+        "prob": 0.6
+    },
+    "FnRename" :{
+        "enabled": true,
+        "pattern": ".*",
+        "prob": 0.8
+    },
+    "InvocationRename": {
+        "enabled": true,
+        "prob": 0.8
+    },
+    "TypeRefMutate": {
+        "enabled": true,
+        "prob": 0.8
+    },
+    "Deletion": {
+        "enabled": false,
+        "global": {
+            "typeNotTouch": ["return", "if"],
+            "distribution": "even",
+            "linesNotToTouch": [1],
+            "minNumOfLinesToDelete": 1,
+            "maxNumOfLinesToDelete": 3
+        }
+    }
+}
