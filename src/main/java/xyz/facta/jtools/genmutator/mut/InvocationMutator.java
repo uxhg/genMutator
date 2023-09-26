@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.reference.CtTypeReference;
 
 import java.util.Random;
 
@@ -24,11 +25,21 @@ public class InvocationMutator extends AbstractProcessor<CtInvocation<?>> {
         if (invocation.getExecutable() != null && random.nextDouble() < MUTATION_PROBABILITY) {
             String oldName = invocation.getExecutable().getSimpleName();
             // Generate a new name using your VarNameGenerator
-            String invokedFnClassName = invocation.getExecutable().getDeclaringType().getQualifiedName();
+            logger.debug("invocation: {}, {}", invocation.getExecutable(), invocation.getExecutable().getSimpleName());
+            String invokedFnClassName = getInvocationClassName(invocation);
             String newName = FnNameMutator.renameFn(oldName, invokedFnClassName);
             // Replace the invoked method's name with the new name
             logger.debug("Rename invoked function: {}:{} -> {}", invokedFnClassName, oldName, newName);
             invocation.getExecutable().setSimpleName(newName);
+        }
+    }
+
+    private String getInvocationClassName(CtInvocation<?> invocation) {
+        CtTypeReference<?> declaringType = invocation.getExecutable().getDeclaringType();
+        if (declaringType != null) {
+            return declaringType.getQualifiedName();
+        } else {
+            return "";
         }
     }
 
