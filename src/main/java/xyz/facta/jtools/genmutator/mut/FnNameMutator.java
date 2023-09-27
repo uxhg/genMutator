@@ -27,7 +27,8 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
     }
 
     public static String renameFn(String fnName, String className) {
-        String oldNameAsKey = className + ":" + fnName;
+        //String oldNameAsKey = className + ":" + fnName;
+        String oldNameAsKey = fnName;
         logger.debug("[to rename function] {}", oldNameAsKey);
         if (changedNames.containsKey(oldNameAsKey)) {
             return changedNames.get(oldNameAsKey);
