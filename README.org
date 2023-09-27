@@ -25,11 +25,13 @@ cd examples
 ./run-example.sh
 #+end_src
 
+*** Configuration
 
 ** Mutators
-+ =AddIfMutator= will add a =if= structure surrounding function invocations with a probability (preset 40%). Enabled with =-mai=.
-+ =BinOpExprMutator= will randomly change the binary operators (logic operators, comparison operators, arithmetic operators) used in the binary operation expression. Enabled with =-mbo=.
-+ =VarRenameMutator= will randomly change a variable to another name generated from a dictionary with a probability (preset 50%). Enabled with =-mrv=.
++ =AddIfMutator= will add a =if= structure surrounding function invocations with a probability (preset 40%). 
++ =BinOpExprMutator= will randomly change the binary operators (logic operators, comparison operators, arithmetic operators) used in the binary operation expression.
++ =VarRenameMutator= will randomly change a variable to another name generated from a dictionary with a probability. 
+
 
 ** Credits
 + Borrow some code from https://github.com/SpoonLabs/metamutator.

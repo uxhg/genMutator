@@ -28,7 +28,7 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
 
     public static String renameFn(String fnName, String className) {
         String oldNameAsKey = className + ":" + fnName;
-        //logger.debug("To rename function {}", oldNameAsKey);
+        logger.debug("[to rename function] {}", oldNameAsKey);
         if (changedNames.containsKey(oldNameAsKey)) {
             return changedNames.get(oldNameAsKey);
         }
@@ -71,6 +71,7 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
         if (shouldMutate() && patternToMatch.matcher(method.getSimpleName()).matches()) {
             // Generate a new name using the shared NameGenerator
             String newName = renameFn(method.getSimpleName(), method.getDeclaringType().getQualifiedName());
+            logger.debug("[rename function] {} -> {}", method.getSimpleName(), newName);
             //String newName = NameGenerator.generateName(-1, 0.5);
 
             // Create a new method by copying the original method
@@ -79,9 +80,6 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
                 method,
                 true // redirect references to the target type
             );
-
-            // Rename the newly created method
-            logger.debug("Rename function: {} -> {}", method.getSimpleName(), newName);
             mutatedMethod.setSimpleName(newName);
 
             // Remove the original method from the declaring type

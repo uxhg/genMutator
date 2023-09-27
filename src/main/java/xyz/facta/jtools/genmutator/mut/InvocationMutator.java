@@ -25,11 +25,11 @@ public class InvocationMutator extends AbstractProcessor<CtInvocation<?>> {
         if (invocation.getExecutable() != null && random.nextDouble() < MUTATION_PROBABILITY) {
             String oldName = invocation.getExecutable().getSimpleName();
             // Generate a new name using your VarNameGenerator
-            logger.debug("invocation: {}, {}", invocation.getExecutable(), invocation.getExecutable().getSimpleName());
+            logger.debug("[invocation] {}, {}", invocation.getExecutable(), invocation.getExecutable().getSimpleName());
             String invokedFnClassName = getInvocationClassName(invocation);
             String newName = FnNameMutator.renameFn(oldName, invokedFnClassName);
             // Replace the invoked method's name with the new name
-            logger.debug("Rename invoked function: {}:{} -> {}", invokedFnClassName, oldName, newName);
+            logger.debug("[rename invoked function] {}:{} -> {}", invokedFnClassName, oldName, newName);
             invocation.getExecutable().setSimpleName(newName);
         }
     }
