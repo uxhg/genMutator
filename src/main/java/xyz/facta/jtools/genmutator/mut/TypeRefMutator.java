@@ -6,6 +6,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.reference.CtTypeReference;
 import xyz.facta.jtools.genmutator.util.NameGenerator;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -15,6 +16,9 @@ public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
     private static double MUTATION_PROBABILITY;
 
     private final Random random = new Random();
+
+    // Keep track of the names that have been changed
+    private static final HashMap<String, String> changedNames = new HashMap<>();
 
     // Define the types within the java.lang and collection subsets as static sets
     private static final Set<String> javaLangTypes = new HashSet<>(Set.of(
@@ -51,12 +55,17 @@ public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
     private void mutateTypeReference(CtTypeReference<?> typeRef) {
         String newType;
         String qualName = typeRef.getQualifiedName();
-        if (qualName.endsWith("[]")) {
-            // If the type is an array, mutate the component type
-            String componentTypeName = qualName.substring(0, qualName.length() - 2);
-            newType = genNewTypeName(componentTypeName);
+        if (changedNames.containsKey(qualName)) {
+            newType = changedNames.get(qualName);
         } else {
-            newType = genNewTypeName(qualName);
+            if (qualName.endsWith("[]")) {
+                // If the type is an array, mutate the component type
+                String componentTypeName = qualName.substring(0, qualName.length() - 2);
+                newType = genNewTypeName(componentTypeName);
+            } else {
+                newType = genNewTypeName(qualName);
+            }
+            changedNames.put(qualName, newType);
         }
         logger.debug("Mutating type reference {} to {}", qualName, newType);
         typeRef.setSimpleName(newType.substring(newType.lastIndexOf('.') + 1));
