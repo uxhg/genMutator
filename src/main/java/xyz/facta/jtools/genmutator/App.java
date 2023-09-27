@@ -146,7 +146,7 @@ public class App {
         fnRenameMut.setNamesChosenToMutate(allFunctionNames);
         InvocationMutator invocationMutator = (InvocationMutator) processors.get("InvocationRename");
         invocationMutator.setNamesChosenToMutate(allFunctionNames);
-        
+
         // Add processors according config
         for (Processor<?> processor : processors.values()) {
             //if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {

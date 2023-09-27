@@ -67,7 +67,7 @@ public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
             }
             changedNames.put(qualName, newType);
         }
-        logger.debug("Mutating type reference {} to {}", qualName, newType);
+        logger.debug("[mutating type reference] {} -> {}", qualName, newType);
         typeRef.setSimpleName(newType.substring(newType.lastIndexOf('.') + 1));
     }
 
@@ -101,7 +101,8 @@ public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
         //if (javaLangTypes.contains(typeName) || collectionTypes.contains(typeName)) {
         //    return true;
         //}
-        return random.nextDouble() < MUTATION_PROBABILITY;
+        //return random.nextDouble() < MUTATION_PROBABILITY;
+        return true;
     }
 }
 
