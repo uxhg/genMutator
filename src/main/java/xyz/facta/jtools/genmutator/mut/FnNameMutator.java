@@ -91,7 +91,8 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
     }
 
     private boolean shouldMutate() {
-        return random.nextDouble() <= MUTATION_PROBABILITY;
+        // return random.nextDouble() <= MUTATION_PROBABILITY;
+        return true;
     }
 
 

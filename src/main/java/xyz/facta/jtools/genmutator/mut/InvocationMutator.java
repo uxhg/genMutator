@@ -22,7 +22,8 @@ public class InvocationMutator extends AbstractProcessor<CtInvocation<?>> {
     @Override
     public void process(CtInvocation<?> invocation) {
         // Check if the invoked method is a method, and optionally apply a random mutation
-        if (invocation.getExecutable() != null && random.nextDouble() < MUTATION_PROBABILITY) {
+        //if (invocation.getExecutable() != null && random.nextDouble() < MUTATION_PROBABILITY) {
+        if (invocation.getExecutable() != null) {
             String oldName = invocation.getExecutable().getSimpleName();
             // Generate a new name using your VarNameGenerator
             logger.debug("[invocation] {}, {}", invocation.getExecutable(), invocation.getExecutable().getSimpleName());
