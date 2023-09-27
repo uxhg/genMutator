@@ -41,7 +41,7 @@ public class App {
         cycles.setType(Number.class);
         options.addOption(cycles);
 
-        Option startNum = new Option( "startNumber", true, "start number in output file names");
+        Option startNum = new Option("startNumber", true, "start number in output file names");
         startNum.setRequired(false);
         startNum.setType(Number.class);
         options.addOption(startNum);
@@ -142,10 +142,16 @@ public class App {
         // Pre-select function names to mutate
         Set<String> allFunctionNames = new HashSet<>(nameCollector.getMethods());
         allFunctionNames.addAll(nameCollector.getInvokedMethods());
+
+        // if corresponding mutators are enabled, pass into name set
         FnNameMutator fnRenameMut = (FnNameMutator) processors.get("FnRename");
-        fnRenameMut.setNamesChosenToMutate(allFunctionNames);
+        if (fnRenameMut != null) {
+            fnRenameMut.setNamesChosenToMutate(allFunctionNames);
+        }
         InvocationMutator invocationMutator = (InvocationMutator) processors.get("InvocationRename");
-        invocationMutator.setNamesChosenToMutate(allFunctionNames);
+        if (invocationMutator != null) {
+            invocationMutator.setNamesChosenToMutate(allFunctionNames);
+        }
 
         // Add processors according config
         for (Processor<?> processor : processors.values()) {
