@@ -1,6 +1,7 @@
 package xyz.facta.jtools.genmutator.util;
 
 import spoon.processing.AbstractProcessor;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
@@ -10,35 +11,45 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NameCollector extends AbstractProcessor<CtElement> {
-    private final Set<String> classNames = new HashSet<>();
-    private final Set<String> methodNames = new HashSet<>();
-    private final Set<String> variableNames = new HashSet<>();
+    private final Set<String> classes = new HashSet<>();
+    private final Set<String> methods = new HashSet<>();
+
+
+    private final Set<String> invokedMethods = new HashSet<>();
+    private final Set<String> variables = new HashSet<>();
 
     @Override
     public void process(CtElement element) {
         if (element != null) {
             if (element instanceof CtClass) {
                 CtClass<?> ctClass = (CtClass<?>) element;
-                classNames.add(ctClass.getSimpleName());
+                classes.add(ctClass.getSimpleName());
             } else if (element instanceof CtMethod) {
                 CtMethod<?> ctMethod = (CtMethod<?>) element;
-                methodNames.add(ctMethod.getSimpleName());
+                methods.add(ctMethod.getSimpleName());
             } else if (element instanceof CtVariable) {
                 CtVariable<?> ctVariable = (CtVariable<?>) element;
-                variableNames.add(ctVariable.getSimpleName());
+                variables.add(ctVariable.getSimpleName());
+            } else if (element instanceof CtInvocation) {
+                CtInvocation<?> ctInvocation = (CtInvocation<?>) element;
+                invokedMethods.add(ctInvocation.getExecutable().getSimpleName());
             }
         }
     }
 
-    public Set<String> getClassNames() {
-        return classNames;
+    public Set<String> getClasses() {
+        return classes;
     }
 
-    public Set<String> getMethodNames() {
-        return methodNames;
+    public Set<String> getMethods() {
+        return methods;
     }
 
-    public Set<String> getVariableNames() {
-        return variableNames;
+    public Set<String> getVariables() {
+        return variables;
+    }
+
+    public Set<String> getInvokedMethods() {
+        return invokedMethods;
     }
 }

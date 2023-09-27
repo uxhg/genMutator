@@ -11,6 +11,7 @@ import spoon.processing.Processor;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
 import xyz.facta.jtools.genmutator.mut.*;
+import xyz.facta.jtools.genmutator.util.NameCollector;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,7 +133,21 @@ public class App {
         launcher.addInputResource(inPath);
 
         //launcher.addProcessor(new EncapsulateClassProcessor());
-        // Add processors with prob
+        // Firstly collect names
+        NameCollector nameCollector = new NameCollector();
+        launcher.addProcessor(nameCollector);
+        CtModel model = launcher.buildModel();
+        launcher.process();
+
+        // Pre-select function names to mutate
+        Set<String> allFunctionNames = new HashSet<>(nameCollector.getMethods());
+        allFunctionNames.addAll(nameCollector.getInvokedMethods());
+        FnNameMutator fnRenameMut = (FnNameMutator) processors.get("FnRename");
+        fnRenameMut.setNamesChosenToMutate(allFunctionNames);
+        InvocationMutator invocationMutator = (InvocationMutator) processors.get("InvocationRename");
+        invocationMutator.setNamesChosenToMutate(allFunctionNames);
+        
+        // Add processors according config
         for (Processor<?> processor : processors.values()) {
             //if (RANDOM.nextDouble() <= PROCESSOR_APPLY_PROBABILITY) {
             launcher.addProcessor(processor);
@@ -140,18 +155,7 @@ public class App {
         }
 
         launcher.getEnvironment().setSourceOutputDirectory(new File(outPath));
-        CtModel model = launcher.buildModel();
 
-        //Map<CtStatement, Integer> originalLineNumbers = new HashMap<>();
-        // Iterate through classes and capture line numbers
-        //for (CtClass clazz : model.getRootPackage().getElements(new TypeFilter<>(CtClass.class))) {
-        //    List<CtStatement> statements = clazz.getElements(new LineFilter());
-
-        //    for (CtStatement statement : statements) {
-        //        // Store the original line number of each statement
-        //        originalLineNumbers.put(statement, statement.getPosition().getLine());
-        //    }
-        //}
         launcher.process();
         launcher.prettyprint();
     }

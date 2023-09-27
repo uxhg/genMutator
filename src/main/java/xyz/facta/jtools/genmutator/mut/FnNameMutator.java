@@ -6,10 +6,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtMethod;
 import xyz.facta.jtools.genmutator.util.NameGenerator;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
@@ -20,10 +17,16 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
     //private final NameGenerator nameGenerator;
     private static final HashMap<String, String> changedNames = new HashMap<>();
 
+    private Set<String> namesChosenToMutate = new HashSet<>();
+
     public FnNameMutator(Pattern patternToMatch, double prob) {
         this.patternToMatch = patternToMatch;
         this.MUTATION_PROBABILITY = prob;
         // this.nameGenerator = nameGenerator;
+    }
+
+    public void setNamesChosenToMutate(Set<String> namesChosenToMutate) {
+        this.namesChosenToMutate = namesChosenToMutate;
     }
 
     public static String renameFn(String fnName, String className) {
@@ -68,6 +71,7 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
 
     @Override
     public void process(CtMethod<?> method) {
+        logger.debug("knwon function names: {}", namesChosenToMutate);
         // Check if the method name matches the specified pattern
         if (shouldMutate() && patternToMatch.matcher(method.getSimpleName()).matches()) {
             // Generate a new name using the shared NameGenerator
