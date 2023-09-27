@@ -111,6 +111,7 @@ public class App {
         return initializeProcessors(rootNode);
     }
 
+    @Deprecated
     private static List<Processor<?>> getProcessors(CommandLine cmd) {
         List<Processor<?>> processors = new ArrayList<>();
         if (cmd.hasOption("mbo")) {
