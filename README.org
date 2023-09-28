@@ -28,11 +28,14 @@ cd examples
 *** Configuration
 
 ** Mutators
-+ =AddIfMutator= will add a =if= structure surrounding function invocations with a probability (preset 40%). 
-+ =BinOpExprMutator= will randomly change the binary operators (logic operators, comparison operators, arithmetic operators) used in the binary operation expression.
-+ =VarRenameMutator= will randomly change a variable to another name generated from a dictionary with a probability. 
++ =AddIfMutator= adds a =if= structure surrounding function invocations with a probability (preset 40%). 
++ =BinOpExprMutator= changes the binary operators (logic operators, comparison operators, arithmetic operators) used in the binary operation expression.
++ =VarRenameMutator= changes a variable to another name generated from a dictionary with a probability. 
++ =FnNameMutator= changes the names of methods (functions) within the source code.
++ =InvocationMutator= changes the names of the invoked methods to other method names.
++ =TypeRefMutator= selects type references, excluding primitive types, and mutates them by replacing them with other types. 
 
 
 ** Credits
 + Borrow some code from https://github.com/SpoonLabs/metamutator.
-+ Words for name generation from https://github.com/dariusk/corpora.
++ Words for name generation from https://github.com/dariusk/corpora and https://github.com/kohsuke/wordnet-random-name (from wordnet).
