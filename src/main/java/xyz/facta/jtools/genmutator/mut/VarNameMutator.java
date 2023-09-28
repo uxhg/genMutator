@@ -9,7 +9,7 @@ import xyz.facta.jtools.genmutator.util.NameGenerator;
 
 import java.util.Random;
 
-public class VarNameMutator extends AbstractProcessor<CtVariable> {
+public class VarNameMutator extends AbstractProcessor<CtVariable<?>> {
 
     private static final Logger logger = LogManager.getLogger(InvocationMutator.class);
     private final double MUTATION_PROBABILITY;
