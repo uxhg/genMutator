@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
+public class TypeRefMutator extends GMAbstractMutator<CtTypeReference<?>> {
     private static final Logger logger = LogManager.getLogger(TypeRefMutator.class);
     private static double MUTATION_PROBABILITY;
 
@@ -103,6 +103,11 @@ public class TypeRefMutator extends AbstractProcessor<CtTypeReference<?>> {
         //}
         //return random.nextDouble() < MUTATION_PROBABILITY;
         return true;
+    }
+
+    @Override
+    public void reset() {
+        changedNames.clear();
     }
 }
 

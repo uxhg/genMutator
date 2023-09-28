@@ -9,7 +9,8 @@ import xyz.facta.jtools.genmutator.util.NameGenerator;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
+public class FnNameMutator extends GMAbstractMutator<CtMethod<?>> {
+    //AbstractProcessor<CtMethod<?>> {
     private static final Logger logger = LogManager.getLogger(FnNameMutator.class);
     private final Random random = new Random();
     private final Pattern patternToMatch;
@@ -27,6 +28,11 @@ public class FnNameMutator extends AbstractProcessor<CtMethod<?>> {
 
     public void setNamesChosenToMutate(Set<String> namesChosenToMutate) {
         this.namesChosenToMutate = namesChosenToMutate;
+    }
+
+    @Override
+    public void reset() {
+        changedNames.clear();
     }
 
     public static String renameFn(String fnName, String className) {

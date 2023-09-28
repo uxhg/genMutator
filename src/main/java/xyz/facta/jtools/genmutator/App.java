@@ -10,6 +10,7 @@ import spoon.processing.AbstractProcessor;
 import spoon.processing.Processor;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.*;
+import spoon.reflect.declaration.CtElement;
 import xyz.facta.jtools.genmutator.mut.*;
 import xyz.facta.jtools.genmutator.util.NameCollector;
 
@@ -94,6 +95,12 @@ public class App {
         }
 
         for (int i = 0; i < numberOfCycles; i++) {
+            // reset some mutators
+            for (AbstractProcessor<?> aProcessor : processors.values()) {
+                if (aProcessor instanceof GMAbstractMutator) {
+                    ((GMAbstractMutator<?>) aProcessor).reset();
+                }
+            }
             int subDirNumber = i + Integer.parseInt(cmd.getOptionValue("startNumber", "1"));
             String currentOutputPath = baseOutputDirectoryPath + File.separator + subDirNumber;
             processSourceCodeDir(inputResourcePath, currentOutputPath, processors);
