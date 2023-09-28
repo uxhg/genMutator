@@ -8,7 +8,9 @@ import xyz.facta.jtools.genmutator.data.NounList;
 import xyz.facta.jtools.genmutator.data.VerbList;
 import xyz.facta.jtools.genmutator.mut.FnNameMutator;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,30 +27,59 @@ public class NameGenerator {
         for (NameCategory category : NameCategory.values()) {
             generatedNames.put(category, new HashSet<>());
         }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
+        loadWords();
+        //try {
+        //    ObjectMapper mapper = new ObjectMapper();
 
-            InputStream adjsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
-            AdjectiveList adjList = mapper.readValue(adjsStream, AdjectiveList.class);
-            logger.info("Load {} adjectives", adjList.getAdjectives().size());
+        //    InputStream adjsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/adjs.json");
+        //    AdjectiveList adjList = mapper.readValue(adjsStream, AdjectiveList.class);
+        //    logger.info("Load {} adjectives", adjList.getAdjectives().size());
 
-            InputStream verbsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
-            VerbList verbList = mapper.readValue(verbsStream, VerbList.class);
-            logger.info("Load {} verbs", verbList.getVerbs().size());
+        //    InputStream verbsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/verbs.json");
+        //    VerbList verbList = mapper.readValue(verbsStream, VerbList.class);
+        //    logger.info("Load {} verbs", verbList.getVerbs().size());
 
-            InputStream nounsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
-            NounList nounList = mapper.readValue(nounsStream, NounList.class);
-            logger.info("Load {} nouns", nounList.getNouns().size());
+        //    InputStream nounsStream = NameGenerator.class.getClassLoader().getResourceAsStream("dict/nouns.json");
+        //    NounList nounList = mapper.readValue(nounsStream, NounList.class);
+        //    logger.info("Load {} nouns", nounList.getNouns().size());
 
-            adjectives = adjList.getAdjectives();
-            // This will hold only the present form
-            verbs = verbList.getVerbs().stream().map(VerbList.Verb::getPresent).collect(Collectors.toList());
-            nouns = nounList.getNouns();
+        //    adjectives = adjList.getAdjectives();
+        //    // This will hold only the present form
+        //    verbs = verbList.getVerbs().stream().map(VerbList.Verb::getPresent).collect(Collectors.toList());
+        //    nouns = nounList.getNouns();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
     }
+
+    private static void loadWords() {
+        adjectives = loadWordList("dict/adjs.txt");
+        verbs = loadWordList("dict/verbs.txt");
+        nouns = loadWordList("dict/nouns.txt");
+
+        logger.info("Load {} adjectives", adjectives.size());
+        logger.info("Load {} verbs", verbs.size());
+        logger.info("Load {} nouns", nouns.size());
+    }
+
+    private static List<String> loadWordList(String fileName) {
+        List<String> wordList = new ArrayList<>();
+        try {
+            InputStream inputStream = NameGenerator.class.getClassLoader().getResourceAsStream(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                wordList.add(line.trim());
+            }
+        } catch (Exception e) {
+            logger.error("Error loading word list from file: {}", fileName, e);
+        }
+        return wordList;
+    }
+
+
+
     public static String generateName(double prefixProb, double adjectiveProb, NameCategory cat) {
         int tries = 1;
         String name;
