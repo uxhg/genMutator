@@ -9,10 +9,7 @@ import xyz.facta.jtools.genmutator.data.VerbList;
 import xyz.facta.jtools.genmutator.mut.FnNameMutator;
 
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class NameGenerator {
@@ -22,9 +19,12 @@ public class NameGenerator {
     private static List<String> nouns;
 
     private static final Random rand = new Random();
-    private static final Set<String> generatedNames = new HashSet<>();
+    private static final Map<NameCategory, Set<String>> generatedNames = new HashMap<>();
     private static final int MAX_TRIES = 4;
     static{
+        for (NameCategory category : NameCategory.values()) {
+            generatedNames.put(category, new HashSet<>());
+        }
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -49,7 +49,7 @@ public class NameGenerator {
             e.printStackTrace();
         }
     }
-    public static String generateName(double prefixProb, double adjectiveProb) {
+    public static String generateName(double prefixProb, double adjectiveProb, NameCategory cat) {
         int tries = 1;
         String name;
         do {
@@ -73,9 +73,9 @@ public class NameGenerator {
             } else {
                 name = generateRandomLetterName();
             }
-        } while (generatedNames.contains(name));
+        } while (generatedNames.get(cat).contains(name));
 
-        generatedNames.add(name);
+        generatedNames.get(cat).add(name);
         return name;
     }
 
@@ -111,5 +111,11 @@ public class NameGenerator {
             return null;
         }
         return word.replaceAll("[^a-zA-Z0-9_]", "");
+    }
+
+    public enum NameCategory {
+        FuncName,
+        VarName,
+        TypeName
     }
 }

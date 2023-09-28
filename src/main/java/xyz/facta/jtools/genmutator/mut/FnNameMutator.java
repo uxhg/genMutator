@@ -54,7 +54,7 @@ public class FnNameMutator extends GMAbstractMutator<CtMethod<?>> {
             return optionalNotKeywords.get(randomIndex);
         }
 
-        String newName = NameGenerator.generateName(-1, 0.5);
+        String newName = NameGenerator.generateName(-1, 0.5, NameGenerator.NameCategory.FuncName);
         String[] fetchKeywords = {"find", "get", "search", "query", "select", "lookUp", "fetch", "retrieve"};
 
         String selectedKeyword = fetchKeywords[(int) (Math.random() * fetchKeywords.length)];

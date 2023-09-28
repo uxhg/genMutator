@@ -26,7 +26,7 @@ public class VarNameMutator extends AbstractProcessor<CtVariable<?>> {
     @Override
     public void process(CtVariable ctVar) {
         if (shouldMutate()) {
-            String newName = NameGenerator.generateName(0.4, 0.6);
+            String newName = NameGenerator.generateName(0.4, 0.6, NameGenerator.NameCategory.VarName);
             logger.debug("Refactor variable name: {} -> {}", ctVar.toString() , newName);
             new CtRenameGenericVariableRefactoring().setTarget(ctVar).setNewName(newName).refactor();
         }
