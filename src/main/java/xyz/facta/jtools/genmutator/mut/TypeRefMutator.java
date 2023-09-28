@@ -73,7 +73,7 @@ public class TypeRefMutator extends GMAbstractMutator<CtTypeReference<?>> {
 
     private String genNewTypeName(String qualName) {
         String newType;
-        String newRandName = NameGenerator.capitalize(NameGenerator.generateName(-1, -1, NameGenerator.NameCategory.TypeName));
+        String newRandName = NameGenerator.capitalize(NameGenerator.generateName(-1, 0.4, NameGenerator.NameCategory.TypeName));
         // Based on the type's subset, choose a random mutation
         if (javaLangTypes.contains(qualName)) {
             // Mutate java.lang types randomly
