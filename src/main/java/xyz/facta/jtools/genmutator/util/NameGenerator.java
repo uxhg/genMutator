@@ -1,18 +1,12 @@
 package xyz.facta.jtools.genmutator.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.facta.jtools.genmutator.data.AdjectiveList;
-import xyz.facta.jtools.genmutator.data.NounList;
-import xyz.facta.jtools.genmutator.data.VerbList;
-import xyz.facta.jtools.genmutator.mut.FnNameMutator;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class NameGenerator {
     private static final Logger logger = LogManager.getLogger(NameGenerator.class);
@@ -23,7 +17,21 @@ public class NameGenerator {
     private static final Random rand = new Random();
     private static final Map<NameCategory, Set<String>> generatedNames = new HashMap<>();
     private static final int MAX_TRIES = 4;
-    static{
+
+    private static final Set<String> java_lang_keywords = new HashSet<>(Arrays.asList(
+        "abstract", "continue", "for", "new", "switch",
+        "assert", "default", "goto", "package", "synchronized",
+        "boolean", "do", "if", "private", "this",
+        "break", "double", "implements", "protected", "throw",
+        "byte", "else", "import", "public", "throws",
+        "case", "enum", "instanceof", "return", "transient",
+        "catch", "extends", "int", "short", "try",
+        "char", "final", "interface", "static", "void",
+        "class", "finally", "long", "strictfp", "volatile",
+        "const", "float", "native", "super", "while"
+    ));
+
+    static {
         for (NameCategory category : NameCategory.values()) {
             generatedNames.put(category, new HashSet<>());
         }
@@ -79,7 +87,6 @@ public class NameGenerator {
     }
 
 
-
     public static String generateName(double prefixProb, double adjectiveProb, NameCategory cat) {
         int tries = 1;
         String name;
@@ -99,12 +106,16 @@ public class NameGenerator {
 
                 // Always add a main word
                 nameBuilder.append(capitalize(nouns.get(rand.nextInt(nouns.size()))));
-                name = sanitizeWord(decapitalize(nameBuilder.toString()));
+                name = nameBuilder.toString();
+                name = sanitizeWord(name);
+                if (cat != NameCategory.TypeName) {
+                    name = decapitalize(name);
+                }
                 tries++;
             } else {
                 name = generateRandomLetterName();
             }
-        } while (generatedNames.get(cat).contains(name));
+        } while (generatedNames.get(cat).contains(name) || java_lang_keywords.contains(name));
 
         generatedNames.get(cat).add(name);
         return name;
