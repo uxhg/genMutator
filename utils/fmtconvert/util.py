@@ -1,8 +1,5 @@
 import logging
-import os
-import shutil
 import sys
-import warnings
 from enum import unique, IntEnum
 
 logger = logging.getLogger(__name__)
@@ -48,5 +45,3 @@ def init_logging(log_level="warning"):
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(ColorFormatter())
     rootlogger.addHandler(handler)
-
-
