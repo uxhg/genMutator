@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import argparse
+import itertools
 import json
 import logging
 import os
 from pathlib import Path
 from typing import Dict, List
 
+import predefined
 from util import init_logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +20,14 @@ def main():
     with open(out_file, 'w') as json_file:
         json.dump(json_data, json_file, indent=2)
 
+
+def assert_predefined():
+    assert len(predefined.instructions) == 5
+    assert len(predefined.output_type_vi) == 5
+
+
 def generate_json_data(directory_path):
+    assert_predefined()
     json_data: List = []
     for root, dirs, files in os.walk(directory_path):
         # for each iteration
@@ -30,12 +39,14 @@ def generate_json_data(directory_path):
                     file_path = os.path.join(root, subdir, filename)
                     file_content = read_file_content(file_path)
                     input_string += file_content + "\n"
-            json_entry: Dict = {
-                "input": input_string,
-                "output": "",
-                "instruction": ""
-            }
-            json_data.append(json_entry)
+            for (instruct, output) in itertools.product(predefined.instructions,
+                                                        predefined.output_type_vi):
+                json_entry: Dict = {
+                    "input": input_string,
+                    "output": output,
+                    "instruction": instruct,
+                }
+                json_data.append(json_entry)
     return json_data
 
 
