@@ -14,7 +14,7 @@
     },
     "AddIf": {
         "enabled": false,
-        "prob": 0.4
+        "prob": 0.7
     },
     "FnRename" :{
         "enabled": false,
