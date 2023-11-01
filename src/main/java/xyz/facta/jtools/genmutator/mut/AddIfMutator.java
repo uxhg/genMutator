@@ -95,7 +95,7 @@ public class AddIfMutator extends AbstractProcessor<CtAssignment<?, ?>> {
 
         CtExpression<Boolean> condition = null;
 
-        if (!booleanVariables.isEmpty() && random.nextInt(100) < 50) { // 50% chance to use boolean variable
+        if (!booleanVariables.isEmpty() ) { // if there is boolean, use boolean variable
             CtExpression<Boolean> randomBoolVar = booleanVariables.get(random.nextInt(booleanVariables.size()));
             if (random.nextBoolean()) { // 50% chance to negate the boolean
                 // condition = factory.Code().createBinaryOperator(condition, UnaryOperatorKind.NOT)  createUnaryOperator(condition, UnaryOperatorKind.NOT);
@@ -103,15 +103,16 @@ public class AddIfMutator extends AbstractProcessor<CtAssignment<?, ?>> {
                 unaryOperator.setKind(UnaryOperatorKind.NOT);
                 unaryOperator.setOperand(randomBoolVar);
                 condition = unaryOperator;
+            } else { // 50% chance to use the boolean as is
+                condition = randomBoolVar;
             }
         } else if (!availableVariables.isEmpty()) {
             // Pick a random variable from the list
             CtVariableAccess<?> randomVariable = availableVariables.get(random.nextInt(availableVariables.size()));
             // Creating a sample condition: "randomVariable != null"
             condition = factory.Code().createCodeSnippetExpression(randomVariable + " != null");
-        } else {
-            // do nothing, return null
-        }
+        }  // else: do nothing, will return null
+
         return condition;
     }
 
