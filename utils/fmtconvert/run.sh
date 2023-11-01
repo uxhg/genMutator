@@ -25,7 +25,8 @@ for i in {1..6}; do
     OUTPUT_FILE="$OUTPUT_DIR/cfg$i.json"
     
     # Run the Python script with the specified parameters
-    python3 "$SCRIPT_DIR/main.py" -l INFO --input "$INPUT_PATH" --out "$OUTPUT_FILE"
+    # note that we pass all bash arguments starting from the 3rd argument to python
+    python3 "$SCRIPT_DIR/main.py" -l INFO --input "$INPUT_PATH" --out "$OUTPUT_FILE" "${@:3}"
     
     echo "Completed processing $DIRECTORY"
 done

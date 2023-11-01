@@ -17,3 +17,19 @@ output_type_vi: list = [
     # "The search is not restricted by null values, so there could be unintended overfetching. I would recommend explicitly excluding nulls in the criteria to optimize the query."
     "Yes, the search includes nullable fields which can lead to full table scans if null values are fetched unintentionally. Consider adding explicit checks for null.",
 ]
+
+output_type_i: list = [
+    "Yes, there is a potential performance issue. Fetching the full entity to check existence can be avoided by using an exists query instead.",
+    "The code could be optimized by using an existence check to verify presence rather than retrieving the full object from the database.",
+    "Retrieving the entity to check if it exists introduces unnecessary overhead. An exists check would improve performance by avoiding the fetch.",
+    "A performance concern is evident: Consider replacing full entity retrieval for existence verification with an exists query for enhanced efficiency.",
+    "Performance optimization potential identified: Swap out the full entity retrieval for an exists query to potentially boost efficiency"
+]
+
+output_type_iii: list = [
+    "Retrieving the full entity to only get an attribute introduces unnecessary overhead. Consider using a query that selects just the needed attribute instead.",
+    "Instead of fetching the entire entity, retrieve only the attribute needed through a query. This will improve performance by avoiding fetching unused data.",
+    "A performance enhancement suggestion: Instead of retrieving the complete entity, tailor the query to fetch only the essential attribute. This strategy avoids unnecessary data retrieval and boosts efficiency.",
+    "To enhance performance, retrieve solely the necessary attribute through a refined query, avoiding the overhead of fetching surplus data.",
+    "Consider optimizing by querying only the specific attributes required, rather than fetching the entire entity. This targeted approach will notably enhance performance by minimizing unnecessary data retrieval.",
+]
