@@ -77,7 +77,7 @@ public class FnNameMutator extends GMAbstractMutator<CtMethod<?>> {
 
     @Override
     public void process(CtMethod<?> method) {
-        logger.debug("knwon function names: {}", namesChosenToMutate);
+        logger.debug("known function names: {}", namesChosenToMutate);
         // Check if the method name matches the specified pattern
         if (shouldMutate() && patternToMatch.matcher(method.getSimpleName()).matches()) {
             // Generate a new name using the shared NameGenerator
