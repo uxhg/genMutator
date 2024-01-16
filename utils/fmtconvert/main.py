@@ -52,9 +52,13 @@ def generate_json_data(directory_path, concat_sub_dir: bool, issue_type: int,
             if concat_sub_dir:
                 # in each iteration, there are multiple files to be concat together
                 input_string = concat_multiple_files_in_dir_to_str(root, subdir)
+                if not input_string:
+                    continue
                 if rand_pick_one:
                     json_entry: Dict = {
                         "input": input_string,
+                        #"output": "",
+                        #"instruction":""
                         "output": random.choice(output_lists),
                         "instruction": random.choice(predefined.instructions)
                     }
